@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-MO">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ChemScope</title>
+<style>
+/* --- 1. 基礎設定 --- */
+    :root {
+        --bg-radial-inner: #070707; 
+        --bg-radial-outer: #000000;
+        --panel-glass: rgba(20, 20, 20, 0.9);
+        --panel-border: rgba(255, 255, 255, 0.15);
+        --card-glass: rgba(255, 255, 255, 0.05);
+        --text-main: #ffffff;
+        --text-sub: #c2a70c;
+        --text-highlight: #e0d01f;
+        --accent-yellow: #facc15;
+        --accent-blue: var(--accent-yellow);
+    }
+
+    * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+
+    /* --- [修改] 上下標與正負號 分離控制區 --- */
+    
+    /* 1. 下標設定 (控制原子數量，如 H2 的 2) */
+    sub {
+        font-size: 0.7em;      /* 下標字體大小 */
+        line-height: 1;
+        position: relative;
+        vertical-align: baseline;
+        bottom: -0.2em;        /* 下標位置：越負越往下 */
+    }
+
+    /* 2. 上標設定 (控制電荷的"數字"，如 3- 的 3) */
+    sup {
+        font-size: 0.7em;      /* 上標字體大小 */
+        line-height: 1;
+        position: relative;
+        vertical-align: baseline;
+        top: -0.5em;          /* 上標位置：越負越往上 */
+        font-weight: bold;     /* 上標加粗bold，正常為normal */
+        margin-left: 1px;      /* 與主文字的距離 */
+    }
+
+    /* 3. 正負號設定 (專門控制 + 與 -，如 3- 的 -) */
+    .charge-sign {
+        font-size: 1.4em;      /* 正負號可以設大一點，比較清楚 */
+        font-weight: bold;     /* 正負號加粗 */
+        position: relative;
+        top: 0.05em;           /* 正負號微調：正值往下，負值往上 */
+        margin-left: 0px;      /* 正負號與數字的距離 */
+    }
+
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', 'Microsoft JhengHei', 'Arial', sans-serif;
+        background: radial-gradient(circle at center, var(--bg-radial-inner) 0%, var(--bg-radial-outer) 100%);
+        color: var(--text-main);
+        height: 100vh; overflow: hidden; display: flex; flex-direction: column;
+        overscroll-behavior: none;
+    }
+
+    .app-container { display: flex; width: 100%; height: 100%; flex-direction: row; }
+
+/* --- 3D 顯示區 --- */
+    .viewport-area {
+        flex: 1; position: relative;
+        background-image: 
+            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), 
+            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+        background-size: 60px 60px; 
+        background-position: center center;
+        overflow: hidden; cursor: grab;
+        touch-action: none; 
+        -webkit-user-select: none;
+        will-change: transform;
+        transform: translateZ(0);
+    } 
+
+    .viewport-header { 
+        position: absolute; top: 20px; left: 25px; z-index: 10; pointer-events: none; 
+        max-width: 80%;
+    }
+
+    .viewport-header h1 {
+        margin: 0; 
+        font-size: 1.6rem; /*稍微大一點*/
+        letter-spacing: 2px;
+        /* 改為純白，不再半透明 */
+        color: #ffffff; 
+        /* 增強光暈效果：雙層陰影讓它更亮 */
+        text-shadow: 0 0 5px rgba(255, 245, 137, 0.519);
+        margin-bottom: 5px;
+        display: flex;
+        align-items: baseline; /* 讓版本號對齊文字底部 */
+        gap: 8px;
+    }
+
+    .molecule-display-info {
+        margin-top: 5px;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        padding: 10px 15px;
+        border-radius: 12px;
+        border-left: 4px solid var(--accent-yellow);
+        pointer-events: auto;
+        display: inline-block;
+    }
+
+    .info-formula {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #fff;
+        line-height: 1.1;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+    
+    .info-name {
+        font-size: 1.2rem;
+        color: var(--text-highlight);
+        font-weight: 500;
+        margin-top: 4px;
+    }
+
+    @media (max-width: 768px) {
+        .viewport-header { top: 15px; left: 15px; }
+        .viewport-header h1 { font-size: 0.9rem; letter-spacing: 0.5px; }
+        .molecule-display-info { padding: 8px 12px; }
+        .info-formula { font-size: 1.8rem; }
+        .info-name { font-size: 1rem; }
+    }
+
+    #viewport-subtitle { display: none; }
+    #molecule-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+    #molecule-svg * { pointer-events: none; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html></body></div>    </div>        </div>            
+                        <h1 class="title">ChemScope</h1>        <div class="viewport-header">        <!-- 標題與資訊顯示區 -->    <div class="viewport-area" id="viewport"><div class="app-container"><body></head></style>    
