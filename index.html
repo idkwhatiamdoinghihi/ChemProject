@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-MO">
+<html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -39,9 +39,7 @@
     /* Make the 3D viewport area pure white in light mode */
     body.light-mode .viewport-area { background: #ffffff !important; background-image: none !important; }
     body.light-mode .viewport-header h1 { color: #0f172a; text-shadow: none; }
-    body.light-mode .molecule-display-info { background: #ffffff !important; color: #0f172a; text-shadow: none; border: none; }
-    body.light-mode .molecule-display-info .info-formula, body.light-mode .molecule-display-info .info-name { color: #0f172a; }
-    body.light-mode .molecule-display-info .info-formula { text-shadow: none; }
+    /* molecule-display-info removed */
     body.light-mode .creator-credit { background: #ffffff !important; color: #0f172a !important; text-shadow: none; border: none; }
     /* Make the divider between viewport and controls a simple solid medium-dark grey */
     body.light-mode .controls-area { border-left: 1px solid #6b7280; box-shadow: none; }
@@ -121,7 +119,7 @@
 
 /* --- 3D 顯示區 --- */
     .viewport-area {
-        flex: 1; position: relative;
+        flex: 0 0 60%; width: 60%; position: relative;
         background-image: 
             linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), 
             linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
@@ -151,40 +149,11 @@
         gap: 8px;
     }
 
-    .molecule-display-info {
-        margin-top: 5px;
-        background: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(4px);
-        padding: 10px 15px;
-        border-radius: 12px;
-        border-left: none;
-        /* nudge left to remove small leftover gap after border removal */
-        margin-left: -8px;
-        pointer-events: auto;
-        display: inline-block;
-    }
-
-    .info-formula {
-        font-size: 2.2rem;
-        font-weight: 700;
-        color: #fff;
-        line-height: 1.1;
-        text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-    }
-    
-    .info-name {
-        font-size: 1.2rem;
-        color: var(--text-highlight);
-        font-weight: 500;
-        margin-top: 4px;
-    }
+    /* .molecule-display-info and related styles removed */
 
     @media (max-width: 768px) {
         .viewport-header { top: 15px; left: 15px; }
         .viewport-header h1 { display: none; font-size: 0.9rem; letter-spacing: normal; }
-        .molecule-display-info { padding: 8px 12px; }
-        .info-formula { font-size: 1.8rem; }
-        .info-name { font-size: 1rem; }
     }
 
     #viewport-subtitle { display: none; }
@@ -240,7 +209,7 @@
     .tool-panel.active { display: block; }
 
     /* Allow interactive elements in the header (viewport-header uses pointer-events:none globally) */
-    .viewport-header .app-switch-root, .viewport-header .title-btn, .viewport-header .molecule-display-info, .viewport-header .input-note { pointer-events: auto; }
+    .viewport-header .app-switch-root, .viewport-header .title-btn, .viewport-header .input-note { pointer-events: auto; }
 
     .card { 
         background: var(--card-glass); border: 1px solid var(--panel-border); 
@@ -389,7 +358,7 @@
     }
 
     .controls-area { 
-        width: 520px; min-width: 360px;
+        flex: 0 0 40%; width: 40%;
         background-color: var(--panel-glass);
         backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
         border-left: 1px solid #6b7280; /* simple solid medium-to-dark grey */
@@ -398,6 +367,7 @@
         box-shadow: none; 
         z-index: 20;
     }
+    .controls-content { margin: auto 0; width: 100%; }
     #mobile-panel-handle { display: none; }
 
     .input-note { font-size: 0.8rem; color: var(--text-sub); margin-top: 10px; line-height: 1.4; }
@@ -735,6 +705,385 @@
 
 
 </style>
+<style>
+/* Restore ChemScope molecule-display-info appearance (scoped) */
+.viewport-area[data-tool="ChemScope"] .molecule-display-info {
+    margin-top: 5px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    padding: 10px 15px;
+    border-radius: 12px;
+    border-left: none;
+    margin-left: -8px;
+    pointer-events: auto;
+    display: inline-block;
+}
+.viewport-area[data-tool="ChemScope"] .info-formula {
+    font-size: 2.2rem; font-weight:700; color:#fff; line-height:1.1; text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+.viewport-area[data-tool="ChemScope"] .info-name { font-size:1.2rem; color: var(--text-highlight); font-weight:500; margin-top:4px; }
+
+/* Elements page - periodic table styles (scoped) */
+.viewport-panel[data-tool="Elements"] {
+    --pt-border-color: transparent;
+    --pt-bg-color: #f9f9f9;
+    --pt-highlight: #e0f7fa;
+    font-family: 'Noto Serif TC', serif;
+}
+
+/* Force hide controls when Elements or Equation Balancer is active */
+body:has(.viewport-panel.active[data-tool="Elements"]) .controls-area,
+body:has(.viewport-panel.active[data-tool="Equation Balancer"]) .controls-area {
+    display: none !important;
+}
+
+/* Force full width for Elements and Equation Balancer viewports */
+.viewport-area[data-tool="Elements"],
+.viewport-area[data-tool="Equation Balancer"] {
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Fallback for older browsers */
+.viewport-panel.active[data-tool="Elements"] ~ .controls-area,
+.viewport-panel.active[data-tool="Equation Balancer"] ~ .controls-area {
+    display: none !important;
+}
+
+.viewport-panel[data-tool="Elements"] .elements-container {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    padding-top: 0; /* Remove padding-top to allow true centering */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.viewport-panel[data-tool="Elements"] .periodic-table {
+    display: grid;
+    grid-template-columns: 30px repeat(18, 65px);
+    grid-template-rows: 30px 85px 85px 85px 85px 85px 85px 85px 85px;
+    gap: 4px;
+    /* Remove max-width/overflow from here, let container handle it via transform */
+    padding-bottom: 0; /* Remove padding-bottom */
+    justify-content: center;
+    margin-top: 12vh; /* Move downward slightly */
+    transform-origin: center center;
+}
+
+.viewport-panel[data-tool="Elements"] .element {
+    border: 1px solid var(--pt-border-color);
+    background-color: var(--pt-bg-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 2px;
+    cursor: pointer;
+    transition: transform 0.1s, background-color 0.2s;
+    user-select: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    color: #000;
+}
+
+.viewport-panel[data-tool="Elements"] .element:hover {
+    transform: scale(1.05);
+    background-color: var(--pt-highlight);
+    z-index: 2;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    border-color: #000;
+}
+
+.viewport-panel[data-tool="Elements"] .at-mass { font-size: 11px; font-weight: bold; color: #555; }
+.viewport-panel[data-tool="Elements"] .symbol { font-size: 22px; font-weight: bold; margin: -2px 0; color: #000; }
+.viewport-panel[data-tool="Elements"] .name { font-size: 10px; text-align: center; line-height: 1; color: #333; text-transform: lowercase; }
+.viewport-panel[data-tool="Elements"] .at-num { font-size: 12px; color: #555; }
+
+.viewport-panel[data-tool="Elements"] .key-box-container {
+    grid-column: 4 / 10;
+    grid-row: 3 / 5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+}
+
+.viewport-panel[data-tool="Elements"] .key-box {
+    border: 1px solid var(--pt-border-color);
+    padding: 10px;
+    text-align: center;
+    background: white;
+    width: 220px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    color: #000;
+}
+.viewport-panel[data-tool="Elements"] .key-label { font-size: 10px; color: #555; }
+.viewport-panel[data-tool="Elements"] .key-title { font-weight: bold; margin-bottom: 5px; font-size: 14px; color: #000; }
+
+.viewport-panel[data-tool="Elements"] .col-header {
+    text-align: center;
+    font-weight: bold;
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    padding-bottom: 5px;
+    font-size: 18px;
+    color: #fff;
+}
+
+.viewport-panel[data-tool="Elements"] .period-header {
+    text-align: center;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #fff;
+}
+
+.viewport-panel[data-tool="Elements"] .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px);
+}
+
+.viewport-panel[data-tool="Elements"] .info-card {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 550px;
+    max-width: 95vw;
+    text-align: left;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    position: relative;
+    animation: popIn 0.3s ease;
+    color: #000;
+    font-family: 'Noto Serif TC', serif;
+}
+
+@keyframes popIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.viewport-panel[data-tool="Elements"] .close-btn {
+    position: absolute;
+    top: 10px; right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    z-index: 10;
+}
+.viewport-panel[data-tool="Elements"] .close-btn:hover { color: red; }
+
+.viewport-panel[data-tool="Elements"] .card-header { 
+    text-align: center; 
+    border-bottom: 2px solid rgba(0,0,0,0.1); 
+    padding-bottom: 10px; 
+    margin-bottom: 10px; 
+}
+.viewport-panel[data-tool="Elements"] .card-header h2 { margin: 0; font-size: 24px; color: #000; font-family: 'Noto Serif TC', serif; }
+.viewport-panel[data-tool="Elements"] .cn-name { font-size: 20px; margin-left: 10px; color: #444; font-weight: bold; font-family: 'Noto Serif TC', serif; }
+
+.viewport-panel[data-tool="Elements"] .card-symbol { 
+    font-size: 80px; 
+    font-weight: bold; 
+    color: #333; 
+    text-align: center; 
+    margin: 5px 0 15px 0; 
+    font-family: 'Noto Serif TC', serif;
+    line-height: 1;
+}
+
+.viewport-panel[data-tool="Elements"] .card-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 30px;
+}
+
+.viewport-panel[data-tool="Elements"] .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    font-size: 13px;
+    color: #333;
+    font-family: 'Noto Serif TC', serif;
+}
+.viewport-panel[data-tool="Elements"] .detail-row strong { color: #000; flex-shrink: 0; margin-right: 10px; }
+.viewport-panel[data-tool="Elements"] .detail-val { text-align: right; }
+
+.viewport-panel[data-tool="Elements"] .orbital-diagram {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 5px;
+}
+.viewport-panel[data-tool="Elements"] .orb-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.viewport-panel[data-tool="Elements"] .orb-boxes {
+    display: flex;
+}
+.viewport-panel[data-tool="Elements"] .orb-box {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #444;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    line-height: 1;
+    margin-left: -1px;
+    background: rgba(255,255,255,0.6);
+    color: #000;
+}
+.viewport-panel[data-tool="Elements"] .orb-box:first-child { margin-left: 0; }
+.viewport-panel[data-tool="Elements"] .orb-label { font-size: 10px; margin-top: 2px; color: #555; }
+
+/* Equation Balancer Styles */
+.viewport-panel[data-tool="Equation Balancer"] .balancer-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 20px;
+    padding-top: 80px; /* Clear header */
+    padding-bottom: 60px; /* Move upward */
+}
+
+.viewport-panel[data-tool="Equation Balancer"] .balancer-card {
+    background: rgba(40, 40, 40, 0.6);
+    padding: 5vh 5vh 1.5vh 5vh;
+    border-radius: 24px;
+    width: 80vw;
+    height: 55vh;
+    min-width: 360px;
+    min-height: 400px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    font-family: 'Noto Serif TC', serif;
+    color: var(--text-main);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.viewport-panel[data-tool="Equation Balancer"] .balancer-instruction {
+    margin-top: 0;
+    margin-bottom: 2.5vh;
+    font-size: 3.5vh;
+    color: var(--accent-yellow);
+    text-align: center;
+    font-weight: bold;
+}
+
+.viewport-panel[data-tool="Equation Balancer"] .input-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 2.5vh;
+}
+
+.viewport-panel[data-tool="Equation Balancer"] #eq-input {
+    flex: 1;
+    padding: 12px;
+    font-size: 2.5vh;
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    outline: none;
+    font-family: 'Noto Serif TC', serif;
+    background: rgba(0,0,0,0.3);
+    color: white;
+    transition: border 0.3s;
+    height: 5.5vh;
+}
+
+.viewport-panel[data-tool="Equation Balancer"] #eq-input:focus {
+    border-color: var(--accent-yellow);
+}
+
+.viewport-panel[data-tool="Equation Balancer"] #btn-balance {
+    padding: 0 30px;
+    font-size: 2.2vh;
+    font-weight: bold;
+    font-family: 'Noto Serif TC', serif;
+    background: var(--accent-yellow);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    height: 5.5vh;
+    transition: filter 0.2s;
+}
+
+.viewport-panel[data-tool="Equation Balancer"] #btn-balance:hover {
+    filter: brightness(1.1);
+}
+
+.viewport-panel[data-tool="Equation Balancer"] .eq-msg {
+    min-height: 24px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.viewport-panel[data-tool="Equation Balancer"] .eq-msg.error {
+    color: #ff4d4d;
+}
+
+.viewport-panel[data-tool="Equation Balancer"] .eq-msg.type {
+    color: var(--accent-yellow);
+    margin-top: 2vh;
+    font-size: 3.5vh;
+    text-align: center;
+}
+
+.viewport-panel[data-tool="Equation Balancer"] .eq-result {
+    font-size: 4.5vh;
+    text-align: center;
+    margin-top: 10px;
+    padding: 10px 20px;
+    background: transparent;
+    border-radius: 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+    line-height: 1.5;
+    overflow-y: auto;
+}
+
+.viewport-panel[data-tool="Equation Balancer"] .balanced-eq {
+    font-family: 'Cambria Math', 'Cambria', serif;
+    font-style: normal;
+    margin-bottom: 25px;
+}
+
+.viewport-panel[data-tool="Equation Balancer"] .chem-formula {
+    display: inline-block;
+}
+
+.viewport-panel[data-tool="Equation Balancer"] .chem-coeff {
+    color: #87CEEB;
+    font-weight: 900;
+    margin-right: 6px;
+}
+
+
+</style>
+</style>
 </head>
 <body>
 
@@ -749,7 +1098,7 @@
             <div class="app-switch-menu" id="titleSwitchMenu" role="menu" aria-hidden="true">
                 <button class="control-button app-switch-item" data-tool="ChemScope" role="menuitem">ChemScope</button>
                 <button class="control-button app-switch-item" data-tool="Elements" role="menuitem">Elements</button>
-                <button class="control-button app-switch-item" data-tool="EquationBalancer" role="menuitem">Equation Balancer</button>
+                <button class="control-button app-switch-item" data-tool="Equation Balancer" role="menuitem">Equation Balancer</button>
             </div>
         </div>
     </div>
@@ -833,20 +1182,70 @@
     <div class="viewport-area viewport-panel" data-tool="Elements" style="display:none">
         <div class="viewport-header">
             <h1 class="title">Elements</h1>
-            <div class="molecule-display-info" id="elements-display-info">
-                <div class="info-formula">--</div>
-                <div class="info-name">Elements Browser</div>
+            <!-- molecule-display-info removed -->
+        </div>
+
+        <div class="elements-container">
+            <div class="periodic-table" id="table-container">
+                <!-- Javascript will populate the boxes -->
+                
+                <!-- The Key Box -->
+                <div class="key-box-container">
+                    <h3 class="key-title">Key</h3>
+                    <div class="key-box">
+                        <div class="key-label">relative atomic mass</div>
+                        <div style="font-weight: bold; font-size: 20px; margin: 2px 0; color: #000;">atomic symbol</div>
+                        <div class="key-label">name</div>
+                        <div class="key-label" style="border-top: 1px solid #ccc; margin-top: 4px; padding-top:2px;">atomic (proton) number</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- The Information Card Modal -->
+            <div class="modal-overlay" id="modal">
+                <div class="info-card">
+                    <span class="close-btn" onclick="closeModal()">&times;</span>
+                    <div class="card-header">
+                        <h2 id="card-name">Element Name</h2>
+                    </div>
+                    <div class="card-symbol" id="card-symbol">Sy</div>
+                    
+                    <div class="card-detail">
+                        <span>Atomic Number:</span>
+                        <strong id="card-num">0</strong>
+                    </div>
+                    <div class="card-detail">
+                        <span>Relative Mass:</span>
+                        <strong id="card-mass">0</strong>
+                    </div>
+                    <div class="card-detail">
+                        <span>Category:</span>
+                        <strong id="card-cat">Unknown</strong>
+                    </div>
+                    <p id="card-desc" style="font-size: 13px; color: #666; margin-top: 20px;">
+                        Description
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Equation Balancer viewport panel (single-page) -->
-    <div class="viewport-area viewport-panel" data-tool="EquationBalancer" style="display:none">
+    <div class="viewport-area viewport-panel" data-tool="Equation Balancer" style="display:none">
         <div class="viewport-header">
             <h1 class="title">Equation Balancer</h1>
-            <div class="molecule-display-info" id="eqbal-display-info">
-                <div class="info-formula">--</div>
-                <div class="info-name">Balance equations</div>
+        </div>
+        
+        <div class="balancer-container">
+            <div class="balancer-card">
+                <p class="balancer-instruction">Unbalanced Chemical Equation (use "=" for → or ⇌)</p>
+                <div class="input-row">
+                    <input type="text" id="eq-input" placeholder="e.g. H2 + O2 = H2O" autocomplete="off" spellcheck="false">
+                    <button id="btn-balance">Balance</button>
+                </div>
+                <div id="eq-error" class="eq-msg error"></div>
+                <div id="eq-result" class="eq-result"></div>
+                <div id="eq-type" class="eq-msg type"></div>
             </div>
         </div>
     </div>
@@ -918,10 +1317,10 @@
             </div>
 
             <div class="tool-panel" data-tool="Elements" style="display:none">
-                <div class="card"><div class="card-title">Elements</div><div class="card">Elements control panel placeholder (periodic table controls).</div></div>
+                <!-- Elements control panel removed to allow full-screen periodic table -->
             </div>
 
-            <div class="tool-panel" data-tool="EquationBalancer" style="display:none">
+            <div class="tool-panel" data-tool="Equation Balancer" style="display:none">
                 <div class="card"><div class="card-title">Equation Balancer</div><div class="card">Equation Balancer control panel placeholder (input equation / options).</div></div>
             </div>
 
@@ -1071,7 +1470,75 @@ const ELEMENT_PROPS = {
     "Z":      { ve: 0, c3d: "#3B82F6", r3d: 0,    lp: 0, mass: 0, en: 0 }  // 藍色 Z
 };
 
-// ========== [請插入這段 JS] 電子組態邏輯 ==========
+// Elements UI: build periodic table and popup (scoped, minimal)
+(function(){
+    function buildTable(){
+        const table = document.getElementById('periodicTable'); if(!table) return;
+        table.innerHTML = '';
+        const lanth = [], actin = [];
+        ELECTRON_DATA.forEach(el=>{
+            const btn = document.createElement('button');
+            btn.className = 'element-cell';
+            btn.setAttribute('data-z', el.z);
+            btn.setAttribute('data-sym', el.s);
+            const displayName = el.cn || el.n || '';
+            // Determine mass to display: prefer ELEMENT_PROPS, then ELECTRON_DATA's el.mass, else fallback to atomic number
+            let rawMass = '';
+            if (typeof ELEMENT_PROPS !== 'undefined' && ELEMENT_PROPS[el.s] && ELEMENT_PROPS[el.s].mass) rawMass = ELEMENT_PROPS[el.s].mass;
+            else if (el.mass) rawMass = el.mass;
+            else rawMass = el.z;
+            // format numeric masses to 2 decimals, else use as-is
+            let massVal = rawMass;
+            const n = Number(rawMass);
+            if (!Number.isNaN(n)) {
+                massVal = n >= 100 ? n.toFixed(0) : n.toFixed(2);
+            }
+            const nameVal = el.n || el.cn || '';
+            btn.innerHTML = `<div class=\"mass\">${massVal}</div><div class=\"sym\">${el.s}</div><div class=\"name\">${nameVal}</div><div class=\"num\">${el.z}</div>`;
+            btn.addEventListener('click', ()=> showPopup(el));
+
+            // place by IUPAC group (1-18) and period p
+            if(typeof el.iupac === 'number' && el.iupac >= 1 && el.iupac <= 18){
+                btn.style.gridColumn = el.iupac;
+                btn.style.gridRow = el.p;
+                table.appendChild(btn);
+            } else {
+                // collect lanth/actinides for separate rows
+                if(el.z >= 57 && el.z <= 71) lanth.push(btn);
+                else if(el.z >= 89 && el.z <= 103) actin.push(btn);
+                else {
+                    // fallback: try placing by period
+                    btn.style.gridColumn = 1;
+                    btn.style.gridRow = el.p || 1;
+                    table.appendChild(btn);
+                }
+            }
+        });
+
+        // place lanthanides and actinides in dedicated rows near the bottom
+        const lanthRow = 8, actinRow = 9, colStart = 3;
+        lanth.forEach((btn,i)=>{ btn.style.gridColumn = (colStart + i); btn.style.gridRow = lanthRow; table.appendChild(btn); });
+        actin.forEach((btn,i)=>{ btn.style.gridColumn = (colStart + i); btn.style.gridRow = actinRow; table.appendChild(btn); });
+    }
+
+    function showPopup(el){
+        const popup = document.getElementById('elementPopup');
+        const content = document.getElementById('popupContent');
+        if(!popup||!content) return;
+        const mass = (typeof ELEMENT_PROPS !== 'undefined' && ELEMENT_PROPS[el.s] && ELEMENT_PROPS[el.s].mass) ? ELEMENT_PROPS[el.s].mass : (el.mass || '');
+        content.innerHTML = `<div class=\"popup-row\"><div class=\"popup-sym\">${el.s}</div><div class=\"popup-meta\"><strong>${el.n} ${el.cn?('('+el.cn+')'):''}</strong><div>Atomic number: ${el.z}</div><div>Mass: ${mass}</div><div>Type: ${el.type||''}</div><div>State: ${el.state||''}</div></div></div>`;
+        popup.classList.add('show'); popup.setAttribute('aria-hidden','false');
+    }
+
+    function closePopup(){ const p=document.getElementById('elementPopup'); if(!p) return; p.classList.remove('show'); p.setAttribute('aria-hidden','true'); }
+
+    document.addEventListener('DOMContentLoaded', ()=>{ buildTable(); document.getElementById('popupClose')?.addEventListener('click', closePopup); document.addEventListener('click', (e)=>{ const p=document.getElementById('elementPopup'); if(!p) return; if(p.classList.contains('show') && !p.contains(e.target) && !e.target.closest('.element-cell')) closePopup(); }); });
+
+    // rebuild when user switches to Elements view
+    document.addEventListener('click', (e)=>{ const t = e.target.closest('.app-switch-item'); if(t && t.dataset.tool === 'Elements'){ setTimeout(buildTable, 80); } });
+})();
+
+// ========== [每日運勢資料庫：最終修訂版]
     const ELECTRON_DATA = [
     // Period 1
     { z: 1, s: "H", n: "Hydrogen", cn: "氫", type: "非金屬", state: "氣體", mp: "-259°C", bp: "-253°C", p: 1, g: "1A", iupac: 1, c: "1s1", noble: "1s1" },
@@ -5537,6 +6004,1347 @@ if (window._nativeRenderScene) window.renderScene = window._nativeRenderScene;
             else loadMolecule(window.currentKey, window.currentVariantKey);
         }
     } catch(e) { console.error('loadMolecule recovery failed', e); }
+})();
+</script>
+</body>
+<script>
+    // Periodic Table Logic
+    (function() {
+        const elements = [
+            // Period 1
+            { num: 1, sym: "H", name: "Hydrogen", mass: "1", col: 8, row: 2, cat: "Non-metal" },
+            { num: 2, sym: "He", name: "Helium", mass: "4", col: 18, row: 2, cat: "Noble Gas" },
+            // Period 2
+            { num: 3, sym: "Li", name: "Lithium", mass: "7", col: 1, row: 3, cat: "Alkali Metal" },
+            { num: 4, sym: "Be", name: "Beryllium", mass: "9", col: 2, row: 3, cat: "Alkaline Earth" },
+            { num: 5, sym: "B", name: "Boron", mass: "11", col: 13, row: 3, cat: "Metalloid" },
+            { num: 6, sym: "C", name: "Carbon", mass: "12", col: 14, row: 3, cat: "Non-metal" },
+            { num: 7, sym: "N", name: "Nitrogen", mass: "14", col: 15, row: 3, cat: "Non-metal" },
+            { num: 8, sym: "O", name: "Oxygen", mass: "16", col: 16, row: 3, cat: "Non-metal" },
+            { num: 9, sym: "F", name: "Fluorine", mass: "19", col: 17, row: 3, cat: "Halogen" },
+            { num: 10, sym: "Ne", name: "Neon", mass: "20", col: 18, row: 3, cat: "Noble Gas" },
+            // Period 3
+            { num: 11, sym: "Na", name: "Sodium", mass: "23", col: 1, row: 4, cat: "Alkali Metal" },
+            { num: 12, sym: "Mg", name: "Magnesium", mass: "24", col: 2, row: 4, cat: "Alkaline Earth" },
+            { num: 13, sym: "Al", name: "Aluminium", mass: "27", col: 13, row: 4, cat: "Post-transition" },
+            { num: 14, sym: "Si", name: "Silicon", mass: "28", col: 14, row: 4, cat: "Metalloid" },
+            { num: 15, sym: "P", name: "Phosphorus", mass: "31", col: 15, row: 4, cat: "Non-metal" },
+            { num: 16, sym: "S", name: "Sulfur", mass: "32", col: 16, row: 4, cat: "Non-metal" },
+            { num: 17, sym: "Cl", name: "Chlorine", mass: "35.5", col: 17, row: 4, cat: "Halogen" },
+            { num: 18, sym: "Ar", name: "Argon", mass: "40", col: 18, row: 4, cat: "Noble Gas" },
+            // Period 4
+            { num: 19, sym: "K", name: "Potassium", mass: "39", col: 1, row: 5, cat: "Alkali Metal" },
+            { num: 20, sym: "Ca", name: "Calcium", mass: "40", col: 2, row: 5, cat: "Alkaline Earth" },
+            { num: 21, sym: "Sc", name: "Scandium", mass: "45", col: 3, row: 5, cat: "Transition Metal" },
+            { num: 22, sym: "Ti", name: "Titanium", mass: "48", col: 4, row: 5, cat: "Transition Metal" },
+            { num: 23, sym: "V", name: "Vanadium", mass: "51", col: 5, row: 5, cat: "Transition Metal" },
+            { num: 24, sym: "Cr", name: "Chromium", mass: "52", col: 6, row: 5, cat: "Transition Metal" },
+            { num: 25, sym: "Mn", name: "Manganese", mass: "55", col: 7, row: 5, cat: "Transition Metal" },
+            { num: 26, sym: "Fe", name: "Iron", mass: "56", col: 8, row: 5, cat: "Transition Metal" },
+            { num: 27, sym: "Co", name: "Cobalt", mass: "59", col: 9, row: 5, cat: "Transition Metal" },
+            { num: 28, sym: "Ni", name: "Nickel", mass: "59", col: 10, row: 5, cat: "Transition Metal" },
+            { num: 29, sym: "Cu", name: "Copper", mass: "63.5", col: 11, row: 5, cat: "Transition Metal" },
+            { num: 30, sym: "Zn", name: "Zinc", mass: "65", col: 12, row: 5, cat: "Transition Metal" },
+            { num: 31, sym: "Ga", name: "Gallium", mass: "70", col: 13, row: 5, cat: "Post-transition" },
+            { num: 32, sym: "Ge", name: "Germanium", mass: "73", col: 14, row: 5, cat: "Metalloid" },
+            { num: 33, sym: "As", name: "Arsenic", mass: "75", col: 15, row: 5, cat: "Metalloid" },
+            { num: 34, sym: "Se", name: "Selenium", mass: "79", col: 16, row: 5, cat: "Non-metal" },
+            { num: 35, sym: "Br", name: "Bromine", mass: "80", col: 17, row: 5, cat: "Halogen" },
+            { num: 36, sym: "Kr", name: "Krypton", mass: "84", col: 18, row: 5, cat: "Noble Gas" },
+            // Period 5
+            { num: 37, sym: "Rb", name: "Rubidium", mass: "85", col: 1, row: 6, cat: "Alkali Metal" },
+            { num: 38, sym: "Sr", name: "Strontium", mass: "88", col: 2, row: 6, cat: "Alkaline Earth" },
+            { num: 39, sym: "Y", name: "Yttrium", mass: "89", col: 3, row: 6, cat: "Transition Metal" },
+            { num: 40, sym: "Zr", name: "Zirconium", mass: "91", col: 4, row: 6, cat: "Transition Metal" },
+            { num: 41, sym: "Nb", name: "Niobium", mass: "93", col: 5, row: 6, cat: "Transition Metal" },
+            { num: 42, sym: "Mo", name: "Molybdenum", mass: "96", col: 6, row: 6, cat: "Transition Metal" },
+            { num: 43, sym: "Tc", name: "Technetium", mass: "[98]", col: 7, row: 6, cat: "Transition Metal" },
+            { num: 44, sym: "Ru", name: "Ruthenium", mass: "101", col: 8, row: 6, cat: "Transition Metal" },
+            { num: 45, sym: "Rh", name: "Rhodium", mass: "103", col: 9, row: 6, cat: "Transition Metal" },
+            { num: 46, sym: "Pd", name: "Palladium", mass: "106", col: 10, row: 6, cat: "Transition Metal" },
+            { num: 47, sym: "Ag", name: "Silver", mass: "108", col: 11, row: 6, cat: "Transition Metal" },
+            { num: 48, sym: "Cd", name: "Cadmium", mass: "112", col: 12, row: 6, cat: "Transition Metal" },
+            { num: 49, sym: "In", name: "Indium", mass: "115", col: 13, row: 6, cat: "Post-transition" },
+            { num: 50, sym: "Sn", name: "Tin", mass: "119", col: 14, row: 6, cat: "Post-transition" },
+            { num: 51, sym: "Sb", name: "Antimony", mass: "122", col: 15, row: 6, cat: "Metalloid" },
+            { num: 52, sym: "Te", name: "Tellurium", mass: "128", col: 16, row: 6, cat: "Metalloid" },
+            { num: 53, sym: "I", name: "Iodine", mass: "127", col: 17, row: 6, cat: "Halogen" },
+            { num: 54, sym: "Xe", name: "Xenon", mass: "131", col: 18, row: 6, cat: "Noble Gas" },
+            // Period 6
+            { num: 55, sym: "Cs", name: "Caesium", mass: "133", col: 1, row: 7, cat: "Alkali Metal" },
+            { num: 56, sym: "Ba", name: "Barium", mass: "137", col: 2, row: 7, cat: "Alkaline Earth" },
+            { num: 57, sym: "La*", name: "Lanthanum", mass: "139", col: 3, row: 7, cat: "Lanthanide" },
+            { num: 72, sym: "Hf", name: "Hafnium", mass: "178", col: 4, row: 7, cat: "Transition Metal" },
+            { num: 73, sym: "Ta", name: "Tantalum", mass: "181", col: 5, row: 7, cat: "Transition Metal" },
+            { num: 74, sym: "W", name: "Tungsten", mass: "184", col: 6, row: 7, cat: "Transition Metal" },
+            { num: 75, sym: "Re", name: "Rhenium", mass: "186", col: 7, row: 7, cat: "Transition Metal" },
+            { num: 76, sym: "Os", name: "Osmium", mass: "190", col: 8, row: 7, cat: "Transition Metal" },
+            { num: 77, sym: "Ir", name: "Iridium", mass: "192", col: 9, row: 7, cat: "Transition Metal" },
+            { num: 78, sym: "Pt", name: "Platinum", mass: "195", col: 10, row: 7, cat: "Transition Metal" },
+            { num: 79, sym: "Au", name: "Gold", mass: "197", col: 11, row: 7, cat: "Transition Metal" },
+            { num: 80, sym: "Hg", name: "Mercury", mass: "201", col: 12, row: 7, cat: "Transition Metal" },
+            { num: 81, sym: "Tl", name: "Thallium", mass: "204", col: 13, row: 7, cat: "Post-transition" },
+            { num: 82, sym: "Pb", name: "Lead", mass: "207", col: 14, row: 7, cat: "Post-transition" },
+            { num: 83, sym: "Bi", name: "Bismuth", mass: "209", col: 15, row: 7, cat: "Post-transition" },
+            { num: 84, sym: "Po", name: "Polonium", mass: "[209]", col: 16, row: 7, cat: "Metalloid" },
+            { num: 85, sym: "At", name: "Astatine", mass: "[210]", col: 17, row: 7, cat: "Halogen" },
+            { num: 86, sym: "Rn", name: "Radon", mass: "[222]", col: 18, row: 7, cat: "Noble Gas" },
+            // Period 7
+            { num: 87, sym: "Fr", name: "Francium", mass: "[223]", col: 1, row: 8, cat: "Alkali Metal" },
+            { num: 88, sym: "Ra", name: "Radium", mass: "[226]", col: 2, row: 8, cat: "Alkaline Earth" },
+            { num: 89, sym: "Ac*", name: "Actinium", mass: "[227]", col: 3, row: 8, cat: "Actinide" },
+            { num: 104, sym: "Rf", name: "Ruther.", mass: "[261]", col: 4, row: 8, cat: "Transition Metal" },
+            { num: 105, sym: "Db", name: "Dubnium", mass: "[262]", col: 5, row: 8, cat: "Transition Metal" },
+            { num: 106, sym: "Sg", name: "Seaborg.", mass: "[266]", col: 6, row: 8, cat: "Transition Metal" },
+            { num: 107, sym: "Bh", name: "Bohrium", mass: "[264]", col: 7, row: 8, cat: "Transition Metal" },
+            { num: 108, sym: "Hs", name: "Hassium", mass: "[277]", col: 8, row: 8, cat: "Transition Metal" },
+            { num: 109, sym: "Mt", name: "Meitner.", mass: "[268]", col: 9, row: 8, cat: "Unknown" },
+            { num: 110, sym: "Ds", name: "Darmst.", mass: "[271]", col: 10, row: 8, cat: "Unknown" },
+            { num: 111, sym: "Rg", name: "Roent.", mass: "[272]", col: 11, row: 8, cat: "Unknown" },
+        ];
+
+        const container = document.getElementById('table-container');
+        if (!container) return;
+
+        // Headers
+        const headers = [
+            { txt: '1', col: 1 }, { txt: '2', col: 2 },
+            { txt: '3', col: 13 }, { txt: '4', col: 14 }, { txt: '5', col: 15 },
+            { txt: '6', col: 16 }, { txt: '7', col: 17 }, { txt: '0', col: 18 }
+        ];
+
+        headers.forEach(h => {
+            const div = document.createElement('div');
+            div.className = 'col-header';
+            div.innerText = h.txt;
+            div.style.gridColumnStart = h.col + 1;
+            div.style.gridRowStart = 1; 
+            container.appendChild(div);
+        });
+
+        // Period Headers (1-7)
+        for (let i = 1; i <= 7; i++) {
+            const div = document.createElement('div');
+            div.className = 'period-header';
+            div.innerText = i;
+            div.style.gridColumnStart = 1;
+            div.style.gridRowStart = i + 1; // Row 1 is group headers
+            container.appendChild(div);
+        }
+
+        // Generate Element Boxes
+        elements.forEach(el => {
+            const div = document.createElement('div');
+            div.className = 'element';
+            
+            // Determine Block
+            let block = '';
+            if (el.sym === 'H' || el.sym === 'He') {
+                block = 's-block';
+            } else if (el.cat === 'Lanthanide' || el.cat === 'Actinide') {
+                block = 'f-block';
+            } else if (el.col >= 1 && el.col <= 2) {
+                block = 's-block';
+            } else if (el.col >= 13 && el.col <= 18) {
+                block = 'p-block';
+            } else if (el.col >= 3 && el.col <= 12) {
+                block = 'd-block';
+            } else {
+                block = 'Unknown';
+            }
+
+            // Determine Color based on Category
+            let bgColor = '#f9f9f9';
+            const catColors = {
+                "Alkali Metal": "#EF9A9A",      // More Red (Red 200)
+                "Alkaline Earth": "#FFCC80",    // Lighter Orange
+                "Transition Metal": "#FFF59D",  // Lighter Yellow
+                "Post-transition": "#B9F6CA",   // Lighter Green
+                "Metalloid": "#B3E5FC",         // Lighter Sky Blue
+                "Halogen": "#F8BBD0",           // Further Lighter Pink
+                "Noble Gas": "#D1C4E9",         // Lighter Purple
+                "Lanthanide": "#80DEEA",        // Lighter Cyan
+                "Actinide": "#82B1FF",          // Lighter Royal Blue
+                "Non-metal": "#90CAF9",         // Lighter Medium Blue
+                "Unknown": "#EEEEEE"            // Lighter Grey
+            };
+            
+            if (el.sym === 'H') {
+                bgColor = '#E0E0E0'; // Deeper Grey for Hydrogen
+            } else if (catColors[el.cat]) {
+                bgColor = catColors[el.cat];
+            }
+
+            // Store block in element object for modal
+            el.block = block;
+            el.bgColor = bgColor;
+
+            // Grid Placement
+            div.style.gridColumnStart = el.col + 1;
+            div.style.gridRowStart = el.row;
+            
+            // Apply background color
+            div.style.backgroundColor = bgColor;
+
+            // HTML Content
+            div.innerHTML = `
+                <span class="at-mass">${el.mass}</span>
+                <span class="symbol">${el.sym}</span>
+                <span class="name">${el.name}</span>
+                <span class="at-num">${el.num}</span>
+            `;
+
+            // Click Event
+            div.addEventListener('click', () => openModal(el));
+
+            container.appendChild(div);
+        });
+
+        // Modal Logic
+        const modal = document.getElementById('modal');
+
+        function generateOrbitalDiagram(configStr) {
+            if (!configStr) return '';
+            // Parse config: "1s2 2s2 2p6" -> [{n:1, type:'s', count:2}, ...]
+            const parts = configStr.split(' ');
+            let html = '<div class="orbital-diagram">';
+            
+            parts.forEach(part => {
+                const match = part.match(/(\d+)([spdf])(\d+)/);
+                if (!match) return;
+                const n = match[1];
+                const type = match[2];
+                const count = parseInt(match[3]);
+                
+                let boxes = 1;
+                if (type === 'p') boxes = 3;
+                else if (type === 'd') boxes = 5;
+                else if (type === 'f') boxes = 7;
+                
+                // Distribute electrons
+                const electrons = new Array(boxes).fill(0);
+                for (let i = 0; i < count; i++) {
+                    electrons[i % boxes]++;
+                }
+                
+                html += `<div class="orb-group"><div class="orb-boxes">`;
+                electrons.forEach(e => {
+                    let arrow = '';
+                    if (e === 1) arrow = '↿';
+                    else if (e === 2) arrow = '↿⇂';
+                    html += `<div class="orb-box">${arrow}</div>`;
+                });
+                html += `</div><div class="orb-label">${n}${type}</div></div>`;
+            });
+            
+            html += '</div>';
+            return html;
+        }
+
+        function openModal(el) {
+            // Find detailed data
+            const eData = (typeof ELECTRON_DATA !== 'undefined') ? ELECTRON_DATA.find(e => e.s === el.sym) : null;
+            
+            const cnName = eData ? eData.cn : '';
+            const atomicNum = el.num;
+            const mass = el.mass;
+            const category = el.cat; 
+            
+            const stateMap = { "氣體": "Gas", "液體": "Liquid", "固體": "Solid", "未知": "Unknown" };
+            const rawState = eData ? eData.state : 'Unknown';
+            const state = stateMap[rawState] || rawState;
+            
+            const mp = eData ? eData.mp : '-';
+            const bp = eData ? eData.bp : '-';
+            const period = el.row - 1; 
+            const group = eData ? (eData.iupac || eData.g) : (el.col > 1 ? el.col - 1 : '-'); // Adjust for period column if using grid col
+            const block = el.block;
+            
+            const rawConfig = eData ? eData.c : '-';
+            // Superscript numbers in config
+            const config = rawConfig.replace(/(\d+)([spdf])(\d+)/g, '$1$2<sup>$3</sup>');
+            
+            const boxNotation = generateOrbitalDiagram(rawConfig);
+
+            // Set card background color
+            const card = document.querySelector('.viewport-panel[data-tool="Elements"] .info-card');
+            if (card) {
+                if (el.bgColor) {
+                    let hex = el.bgColor.replace('#', '');
+                    let r = parseInt(hex.substring(0, 2), 16);
+                    let g = parseInt(hex.substring(2, 4), 16);
+                    let b = parseInt(hex.substring(4, 6), 16);
+                    r = Math.round(r + (255 - r) * 0.7);
+                    g = Math.round(g + (255 - g) * 0.7);
+                    b = Math.round(b + (255 - b) * 0.7);
+                    card.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+                } else {
+                    card.style.backgroundColor = 'white';
+                }
+
+                let displaySym = el.sym;
+                if(el.sym.includes('*')) {
+                    displaySym = el.sym.replace('*', '');
+                }
+
+                // Rebuild Content
+                card.innerHTML = `
+                    <span class="close-btn" onclick="closeModal()">&times;</span>
+                    <div class="card-header">
+                        <h2>${el.name} <span class="cn-name">${cnName}</span></h2>
+                    </div>
+                    <div class="card-symbol">${displaySym}</div>
+                    
+                    <div class="card-details-grid">
+                        <div class="detail-col">
+                            <div class="detail-row"><strong>Atomic No.</strong> <span class="detail-val">${atomicNum}</span></div>
+                            <div class="detail-row"><strong>Relative Atomic Mass</strong> <span class="detail-val">${mass}</span></div>
+                            <div class="detail-row"><strong>Category</strong> <span class="detail-val">${category}</span></div>
+                            <div class="detail-row"><strong>rtp State</strong> <span class="detail-val">${state}</span></div>
+                        </div>
+                        <div class="detail-col">
+                            <div class="detail-row"><strong>Melting Point</strong> <span class="detail-val">${mp}</span></div>
+                            <div class="detail-row"><strong>Boiling Point</strong> <span class="detail-val">${bp}</span></div>
+                            <div class="detail-row"><strong>Period</strong> <span class="detail-val">${period}</span></div>
+                            <div class="detail-row"><strong>Group</strong> <span class="detail-val">${group}</span></div>
+                            <div class="detail-row"><strong>Block</strong> <span class="detail-val">${block}</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-row" style="margin-top: 10px;"><strong>Electronic Configuration</strong> <span class="detail-val">${config}</span></div>
+                    <div class="detail-row" style="flex-direction:column; align-items:center; border-bottom:none;">
+                        <strong style="margin-bottom:5px; align-self: flex-start;">Electronic Configuration (Box Notation)</strong>
+                        ${boxNotation}
+                    </div>
+                `;
+            }
+            modal.style.display = 'flex';
+        }
+
+        window.closeModal = function() {
+            modal.style.display = 'none';
+        }
+
+        // Close when clicking outside card
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Auto-scale logic for Periodic Table
+        function resizePeriodicTable() {
+            const table = document.getElementById('table-container');
+            const container = document.querySelector('.viewport-panel[data-tool="Elements"] .elements-container');
+            if (!table || !container) return;
+
+            // Reset transform to get natural size
+            table.style.transform = 'none';
+            
+            const availableWidth = container.clientWidth;
+            // Use full height for calculation, subtract a small margin
+            const availableHeight = container.clientHeight - 20; 
+            
+            // Natural size of the table (approx 18 * 65 + gaps ~ 1250px width)
+            // We can measure it directly
+            const tableWidth = table.scrollWidth;
+            const tableHeight = table.scrollHeight;
+
+            if (tableWidth === 0 || tableHeight === 0) return;
+
+            const scaleX = (availableWidth - 2) / tableWidth; // Minimal horizontal margin
+            const scaleY = (availableHeight - 2) / tableHeight; // Minimal vertical margin
+            
+            // Allow larger enlargement (5.0x) for larger screens
+            // Multiply by 0.9 to make it slightly smaller as requested
+            let scale = Math.min(scaleX, scaleY, 5.0) * 0.9;
+            
+            // Apply scale
+            // Use translate(-50%, -50%) to center it perfectly if we use absolute positioning + left 50% + top 50%
+            // But here we use flexbox centering, so we just need scale.
+            // However, transform-origin: center center is key.
+            // Add translateY to move it downward slightly (e.g. 5% of height or fixed pixels)
+            // Since we are scaling, using pixels might be safer relative to screen.
+            // But transform applies after layout.
+            // Let's just use margin-top in CSS for the downward movement, and keep transform for scaling.
+            table.style.transform = `scale(${scale})`;
+            
+            // Force re-centering if flexbox isn't enough (sometimes scale affects layout flow)
+            // But with flexbox + transform-origin: center, it should be fine.
+        }
+
+        // Listen for resize and tool switch
+        window.addEventListener('resize', resizePeriodicTable);
+        
+        // Hook into tool switch to trigger resize when Elements becomes visible
+        const originalSwitchTool = window.switchTool; // If exposed, otherwise we use observer
+        
+        // Use MutationObserver to detect when Elements panel becomes active
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.target.classList.contains('active') && 
+                    mutation.target.getAttribute('data-tool') === 'Elements') {
+                    // Wait a tick for layout
+                    setTimeout(resizePeriodicTable, 50);
+                }
+            });
+        });
+        
+        const elementsPanel = document.querySelector('.viewport-panel[data-tool="Elements"]');
+        if (elementsPanel) {
+            observer.observe(elementsPanel, { attributes: true, attributeFilter: ['class', 'style'] });
+        }
+        
+        // Initial call
+        setTimeout(resizePeriodicTable, 100);
+
+    })();
+</script>
+
+<script>
+/* Equation Balancer Logic */
+(function() {
+    const input = document.getElementById('eq-input');
+    const btn = document.getElementById('btn-balance');
+    const errorDiv = document.getElementById('eq-error');
+    const resultDiv = document.getElementById('eq-result');
+    const typeDiv = document.getElementById('eq-type');
+
+    if(btn) {
+        btn.addEventListener('click', handleBalance);
+    }
+    if(input) {
+        input.addEventListener('keydown', (e) => {
+            if(e.key === 'Enter') handleBalance();
+        });
+    }
+
+    // Helper functions for Organic Prediction
+    const isHalogenoalkane = (f) => {
+        if (!f.includes('C') || !f.includes('H')) return false;
+        return /(Cl|Br|I)/.test(f);
+    };
+
+    const getHalogen = (f) => {
+        const m = f.match(/(Cl|Br|I)/);
+        return m ? m[0] : null;
+    };
+
+    const generateSubstitution = (haloalkane, nucleophile) => {
+        const X = getHalogen(haloalkane);
+        if (!X) return null;
+        
+        // Simple string replacement for the halogen
+        // Note: This assumes mono-substituted for simplicity or replaces first occurrence
+        let product = haloalkane.replace(X, '');
+        let byproduct = '';
+        
+        if (nucleophile === 'OH') {
+            product += 'OH';
+            byproduct = X + '-';
+            return `${haloalkane} + OH- = ${product} + ${byproduct}`;
+        } else if (nucleophile === 'CN') {
+            product += 'CN';
+            byproduct = X + '-';
+            return `${haloalkane} + CN- = ${product} + ${byproduct}`;
+        } else if (nucleophile === 'NH3') {
+            product += 'NH2';
+            byproduct = 'NH4' + X; 
+            return `${haloalkane} + NH3 = ${product} + ${byproduct}`;
+        }
+        return null;
+    };
+
+    const generateElimination = (haloalkane) => {
+        // Try to parse CnHmX
+        const match = haloalkane.match(/^C(\d+)H(\d+)(Cl|Br|I)$/);
+        if (match) {
+            const n = parseInt(match[1]);
+            const h = parseInt(match[2]);
+            const X = match[3];
+            // Alkene is CnH(h-1)
+            const alkene = `C${n}H${h-1}`;
+            return `${haloalkane} + OH- = ${alkene} + H2O + ${X}-`;
+        }
+        
+        // Handle structural formats like CH3CH2Cl
+        if (haloalkane === 'CH3CH2Cl') return `CH3CH2Cl + OH- = CH2=CH2 + H2O + Cl-`;
+        if (haloalkane === 'CH3CH2Br') return `CH3CH2Br + OH- = CH2=CH2 + H2O + Br-`;
+        if (haloalkane === 'CH3CH2I') return `CH3CH2I + OH- = CH2=CH2 + H2O + I-`;
+        
+        // Fallback for unparsed but valid looking
+        if (haloalkane.endsWith('Cl') || haloalkane.endsWith('Br') || haloalkane.endsWith('I')) {
+             // Try to guess alkene by removing HX?
+             // Without strict parsing, this is hard. Return null to avoid bad guesses.
+             return null;
+        }
+        return null;
+    };
+
+    function predictProducts(eq) {
+        const parts = eq.split('+').map(s => s.trim());
+        const haloalkane = parts.find(isHalogenoalkane);
+        
+        if (!haloalkane) return [];
+        
+        const results = [];
+        
+        // Check for OH- (or NaOH/KOH)
+        if (parts.some(p => p === 'OH-' || p === 'NaOH' || p === 'KOH')) {
+            // 1. Substitution (aq)
+            const subEq = generateSubstitution(haloalkane, 'OH');
+            if (subEq) results.push({ equation: subEq, type: 'substitution_aq', desc: 'Nucleophilic Substitution (aq)' });
+            
+            // 2. Elimination (eth)
+            const elimEq = generateElimination(haloalkane);
+            if (elimEq) results.push({ equation: elimEq, type: 'elimination_eth', desc: 'Elimination (eth)' });
+        }
+        
+        // Check for CN-
+        if (parts.some(p => p === 'CN-' || p === 'KCN' || p === 'NaCN')) {
+            const subEq = generateSubstitution(haloalkane, 'CN');
+            if (subEq) results.push({ equation: subEq, type: 'substitution_eth', desc: 'Nucleophilic Substitution (eth)' });
+        }
+        
+        // Check for NH3
+        if (parts.some(p => p === 'NH3')) {
+            const subEq = generateSubstitution(haloalkane, 'NH3');
+            if (subEq) results.push({ equation: subEq, type: 'substitution_eth', desc: 'Nucleophilic Substitution (eth)' });
+        }
+        
+        return results;
+    }
+
+    function handleBalance() {
+        const eq = input.value.trim();
+        errorDiv.textContent = '';
+        resultDiv.innerHTML = '';
+        typeDiv.textContent = '';
+        
+        if(!eq) return;
+
+        try {
+            let resultsToRender = [];
+            
+            if (!eq.includes('=')) {
+                // Try prediction
+                const predictions = predictProducts(eq);
+                if (predictions.length > 0) {
+                    predictions.forEach(pred => {
+                        const res = balanceEquation(pred.equation);
+                        resultsToRender.push({ result: res, type: pred.type, desc: pred.desc });
+                    });
+                } else {
+                    // Fallback to normal balance (will likely fail or throw)
+                    const res = balanceEquation(eq);
+                    resultsToRender.push({ result: res, type: null, desc: null });
+                }
+            } else {
+                const res = balanceEquation(eq);
+                resultsToRender.push({ result: res, type: null, desc: null });
+            }
+
+            // Render all results
+            resultsToRender.forEach((item, index) => {
+                if (index > 0) {
+                    const sep = document.createElement('div');
+                    sep.style.borderTop = '1px dashed rgba(255,255,255,0.2)';
+                    sep.style.margin = '20px 0';
+                    resultDiv.appendChild(sep);
+                }
+                
+                const container = document.createElement('div');
+                // Create a temporary div to render into, then move children
+                const tempDiv = document.createElement('div');
+                
+                // We need to modify renderResult to target a specific element or return HTML
+                // Since renderResult writes to resultDiv directly, we need to patch this.
+                // Let's temporarily swap resultDiv
+                const originalResultDiv = resultDiv;
+                
+                // Hack: We can't easily change renderResult's target without changing its signature everywhere.
+                // But we just changed it to accept type.
+                // Let's assume renderResult appends to resultDiv.
+                // Wait, renderResult does `resultDiv.innerHTML = ...`. This overwrites.
+                
+                // I need to change renderResult to return the HTML string instead of setting innerHTML.
+                // OR, I can set resultDiv.innerHTML for the LAST one, but that overwrites previous ones.
+                
+                // Let's modify renderResult to return the HTML string.
+                // I will do another edit to renderResult to return string.
+            });
+            
+            // Re-implementing the loop after I fix renderResult
+             resultsToRender.forEach((item, index) => {
+                if (index > 0) {
+                    resultDiv.innerHTML += `<div style="border-top: 1px dashed rgba(255,255,255,0.2); margin: 20px 0;"></div>`;
+                }
+                
+                if (item.desc) {
+                    resultDiv.innerHTML += `<div style="color: var(--accent-yellow); font-size: 0.9rem; margin-bottom: 5px;">${item.desc}</div>`;
+                }
+                
+                // Call renderResult which now (will) return string or append?
+                // I'll change renderResult to return string.
+                const html = renderResult(item.result, item.type); 
+                resultDiv.innerHTML += html;
+                
+                if (!item.type) {
+                     const type = identifyReactionType(item.result.left, item.result.right);
+                     if(type) {
+                        resultDiv.innerHTML += `<div style="margin-top:25px; font-size:1.1rem; color:var(--accent-yellow); font-family:'Noto Serif TC', serif;"><span style="font-weight:bold;">Reaction Type:</span> ${type}</div>`;
+                     }
+                }
+            });
+
+        } catch (e) {
+            errorDiv.textContent = e.message || "Could not balance equation.";
+        }
+    }
+
+    function identifyReactionType(leftParts, rightParts) {
+        const left = leftParts.map(p => p.formula);
+        const right = rightParts.map(p => p.formula);
+        const types = [];
+        
+        // Helper: Check if formula is exactly an element (e.g. O2, Fe, Cl2)
+        const isElement = (f) => /^[A-Z][a-z]?\d*$/.test(f);
+        // Helper: Check if organic (contains C and H, OR C and Halogens for fully substituted)
+        const isOrganic = (f) => {
+            const hasC = /C(?![a-z])/.test(f);
+            const hasH = /H(?![a-z])/.test(f);
+            if (hasC && hasH) return true;
+            // Allow fully halogenated hydrocarbons (e.g. CCl4, C2Br6)
+            if (hasC && !hasH && (f.includes('Cl') || f.includes('Br') || f.includes('I') || f.includes('F'))) {
+                // Exclude inorganic carbon halides with Oxygen (like COCl2) if desired, but CCl4 is fine.
+                if (!f.includes('O')) return true;
+            }
+            return false;
+        };
+        // Helper: Get unique elements in a formula
+        const getElements = (f) => {
+            const matches = f.match(/[A-Z][a-z]?/g);
+            return matches ? [...new Set(matches)] : [];
+        };
+        
+        const allFormulas = [...left, ...right];
+
+        // --- Redox Analysis (Disproportionation / Comproportionation) ---
+        let isRedox = false;
+        let isDisproportionation = false;
+        let isComproportionation = false;
+
+        if (allFormulas.some(isElement)) {
+            isRedox = true;
+        }
+
+        const elementCounts = {}; 
+        [...left].forEach(f => {
+            getElements(f).forEach(el => {
+                if(!elementCounts[el]) elementCounts[el] = { left: 0, right: 0, leftForms: [], rightForms: [] };
+                elementCounts[el].left++;
+                elementCounts[el].leftForms.push(f);
+            });
+        });
+        [...right].forEach(f => {
+            getElements(f).forEach(el => {
+                if(!elementCounts[el]) elementCounts[el] = { left: 0, right: 0, leftForms: [], rightForms: [] };
+                elementCounts[el].right++;
+                elementCounts[el].rightForms.push(f);
+            });
+        });
+
+        // Special detection for Ammonium Nitrite/Nitrate decomposition (Internal Comproportionation)
+        // NH4NO2 -> N2 + H2O
+        if (left.length === 1 && (left[0].includes('NH4') && (left[0].includes('NO2') || left[0].includes('NO3')))) {
+             if (right.includes('N2') || right.includes('N2O')) {
+                 isComproportionation = true;
+                 isRedox = true;
+             }
+        }
+
+        for (const el in elementCounts) {
+            // Skip H and O for general redox pattern matching to avoid false positives like Acid-Base
+            // (Unless they are in elemental form like O2, H2, which is handled by isElement check above)
+            if (el === 'H' || el === 'O') continue;
+
+            const data = elementCounts[el];
+            
+            // Disproportionation: 1 Reactant -> >=2 Products (e.g. NO2 -> HNO3 + NO)
+            if (data.left === 1 && data.right >= 2) {
+                // Exclude Carbonates decomposition: Ca(HCO3)2 -> CaCO3 + CO2 + H2O (C is +4 in all)
+                if (el === 'C' && data.rightForms.some(f => f.includes('CO3') || f === 'CO2')) continue;
+                // Exclude Sulfates: MnSO4 -> K2SO4 + H2SO4 (S stays +6)
+                if (el === 'S' && data.leftForms.every(f => f.includes('SO4')) && data.rightForms.every(f => f.includes('SO4'))) continue;
+                // Exclude Phosphates
+                if (el === 'P' && data.leftForms.every(f => f.includes('PO4')) && data.rightForms.every(f => f.includes('PO4'))) continue;
+                // Exclude Nitrates (if not redox N) - e.g. Pb(NO3)2 + ... -> NaNO3 + ... (Simple exchange)
+                if (el === 'N' && data.leftForms.every(f => f.includes('NO3')) && data.rightForms.every(f => f.includes('NO3'))) continue;
+                // Exclude Ammonia Substitution: NH3 -> Amine + NH4X (N stays -3)
+                if (el === 'N' && data.leftForms.every(f => f === 'NH3')) continue;
+
+                isDisproportionation = true;
+                isRedox = true;
+            }
+            
+            // Comproportionation: >=2 Reactants -> 1 Product (e.g. KMnO4 + MnSO4 -> MnO2)
+            if (data.left >= 2 && data.right === 1) {
+                // Exclude Carbon in Organic Synthesis (e.g. Williamson Ether: CH3I + NaOCH2CH3 -> CH3OCH2CH3 + NaI)
+                // Carbon appears in 2 reactants and 1 product, but it's usually substitution/addition, not redox comproportionation.
+                if (el === 'C' && left.some(isOrganic)) continue;
+
+                isComproportionation = true;
+                isRedox = true;
+            }
+        }
+
+        if (isDisproportionation) types.push("Redox (Disproportionation)");
+        else if (isComproportionation) types.push("Redox (Comproportionation)");
+        else if (isRedox) types.push("Redox");
+
+        // 2. Combustion / Incomplete Combustion / Oxidation
+        let isCombustion = false;
+        if (left.includes('O2')) {
+            if (left.some(isOrganic)) {
+                // Organic + O2
+                const rightHasOrganic = right.some(isOrganic);
+                
+                if (right.includes('CO2') && right.includes('H2O') && !rightHasOrganic) {
+                    types.push("Complete Combustion");
+                    isCombustion = true;
+                } else if ((right.includes('C') || right.includes('CO')) && right.includes('H2O') && !rightHasOrganic) {
+                    types.push("Incomplete Combustion");
+                    isCombustion = true;
+                } else if (rightHasOrganic) {
+                    // e.g. Alcohol + O2 -> Aldehyde + H2O
+                    types.push("Oxidation");
+                    isCombustion = true; 
+                } else {
+                    // Fallback for other organic oxidations
+                    types.push("Combustion");
+                    isCombustion = true;
+                }
+            } else {
+                // Inorganic + O2 (e.g. Mg + O2)
+                types.push("Combustion");
+                isCombustion = true;
+            }
+            
+            // Ensure Redox is present if not already (Combustion is Redox)
+            if (!types.some(t => t.includes("Redox"))) types.push("Redox");
+        }
+
+        // 3. Synthesis / Addition (A + B -> C)
+        if (left.length > 1 && right.length === 1) {
+            if (left.some(isOrganic)) {
+                // Check for Haloalkane + NH3 -> Salt (Nucleophilic Substitution)
+                const hasHaloalkane = left.some(f => isOrganic(f) && /(Cl|Br|I)/.test(f));
+                const hasAmmonia = left.includes('NH3');
+
+                if (hasHaloalkane && hasAmmonia) {
+                    types.push("Nucleophilic Substitution");
+                } else {
+                    // Electrophilic Addition (Alkene + X2/HX)
+                    if (left.some(f => f === 'Br2' || f === 'Cl2' || f === 'H2' || f.startsWith('H'))) {
+                        types.push("Electrophilic Addition");
+                    }
+                    types.push("Addition");
+                }
+            } else {
+                types.push("Synthesis");
+            }
+        }
+
+        // 4. Decomposition / Elimination / Cracking (A -> B + C)
+        if (left.length === 1 && right.length > 1) {
+            types.push("Decomposition");
+            
+            if (isOrganic(left[0])) {
+                types.push("Cracking");
+                types.push("Elimination");
+            }
+        }
+
+        // 5. Displacement (A + BC -> AC + B)
+        // Exclude if identified as Combustion/Oxidation to prevent CH4 + O2 = C + H2O being Displacement
+        if (left.length === 2 && right.length === 2 && !isCombustion) {
+            const leftHasElem = left.some(isElement);
+            const rightHasElem = right.some(isElement);
+            if (leftHasElem && rightHasElem) {
+                types.push("Displacement");
+            }
+        }
+
+        // 6. Neutralisation (Acid + Base -> Salt + Water)
+        const hasWaterProd = right.includes('H2O');
+        const hasAcid = left.some(f => f.startsWith('H') && f !== 'H2O' && !f.includes('O2'));
+        const hasHydroxide = left.some(f => f.endsWith('OH') || f.includes('OH)'));
+        const hasAmmonia = left.includes('NH3');
+        
+        let isNeutralisation = false;
+        
+        if (hasAcid) {
+            if (hasHydroxide && hasWaterProd) {
+                types.push("Double Decomposition (Neutralisation)");
+                isNeutralisation = true;
+            } else if (hasAmmonia) {
+                types.push("Neutralisation");
+                isNeutralisation = true;
+            }
+        }
+
+        // 7. Double Decomposition / Precipitation
+        // Solubility Rules Implementation
+        const isSoluble = (f) => {
+            const elements = getElements(f);
+            
+            // 1. Always Soluble (No Exceptions listed)
+            // Group 1: Li, Na, K, Rb, Cs, Fr
+            if (elements.some(e => ['Li', 'Na', 'K', 'Rb', 'Cs', 'Fr'].includes(e))) return true;
+            // Ammonium (NH4+)
+            if (f.includes('NH4')) return true;
+            // Nitrates (NO3-)
+            if (f.includes('NO3')) return true;
+            // Hydrogencarbonates (HCO3-)
+            if (f.includes('HCO3')) return true;
+            // Ethanoates (CH3COO- or C2H3O2-)
+            if (f.includes('CH3COO') || f.includes('C2H3O2')) return true;
+
+            // 2. Soluble with Exceptions
+            
+            // Halides (Cl-, Br-, I-) -> Check for Ag, Pb
+            // Regex to ensure it's a halide (ends with Cl/Br/I optionally followed by number)
+            if (/(Cl|Br|I)\d*$/.test(f)) {
+                if (elements.includes('Ag') || elements.includes('Pb')) return false;
+                return true;
+            }
+
+            // Sulphates (SO4 2-) -> Check for Ca, Ba, Pb
+            if (f.includes('SO4')) {
+                if (elements.includes('Ca') || elements.includes('Ba') || elements.includes('Pb')) return false;
+                return true;
+            }
+
+            // 3. Insoluble with Exceptions
+            
+            // Carbonates (CO3 2-) -> Group 1/NH4 already handled.
+            if (f.includes('CO3')) return false;
+
+            // Hydroxides (OH-) -> Group 1/NH4 already handled.
+            // Exceptions: Ca, Ba
+            // Exclude Organic Alcohols (contain C and H) from this check
+            if ((f.endsWith('OH') || f.includes('(OH)')) && !isOrganic(f)) {
+                if (elements.includes('Ca') || elements.includes('Ba')) return true;
+                return false;
+            }
+
+            // Oxides (O2-) -> Group 1/NH4 already handled.
+            // Exceptions: Ca, Ba
+            // Check if binary oxide (Element + O)
+            if (/^[A-Z][a-z]?\d*O\d*$/.test(f)) {
+                if (elements.includes('Ca') || elements.includes('Ba')) return true;
+                return false;
+            }
+            
+            // Default to soluble if no rule matches
+            return true;
+        };
+
+        const hasPrecipitate = right.some(f => {
+            if (f === 'H2O') return false;
+            // Common gases
+            if (['CO2', 'SO2', 'NH3', 'H2', 'O2', 'N2', 'Cl2', 'NO', 'NO2'].includes(f)) return false;
+            return !isSoluble(f);
+        });
+
+        if (left.length === 2 && right.length === 2 && !isRedox && !isCombustion && !isNeutralisation && !left.some(isOrganic)) {
+            if (hasPrecipitate) {
+                types.push("Double Decomposition (Precipitation)");
+            } else {
+                types.push("Double Decomposition");
+            }
+        } else if (hasPrecipitate && !left.some(isOrganic)) {
+            // If it's not a standard Double Decomposition (e.g. it's Redox or complex), but forms a precipitate
+            types.push("Double Decomposition (Precipitation)");
+        }
+
+        // 8. Hydrolysis (Reactant + H2O -> ...)
+        // Fix: Exclude if it's Redox (e.g. NO2 + H2O -> HNO3 + NO is Redox, not Hydrolysis)
+        if (left.includes('H2O') && right.length >= 2 && !isRedox && !isNeutralisation) {
+            types.push("Hydrolysis");
+        }
+
+        // 8. Dehydration (Organic -> ... + H2O)
+        if (right.includes('H2O') && left.some(isOrganic) && left.length === 1) {
+            types.push("Dehydration");
+        }
+
+        // 9. Substitution / Elimination (Organic)
+        if (left.some(isOrganic) && right.some(isOrganic) && left.length >= 2 && right.length >= 2) {
+            // Free Radical: Alkane + Halogen -> Haloalkane + HX
+            if (left.some(f => f === 'Cl2' || f === 'Br2' || f === 'F2' || f === 'I2') && right.some(f => f === 'HCl' || f === 'HBr' || f === 'HF' || f === 'HI')) {
+                types.push("Free-radical Substitution");
+            }
+            // Elimination: Haloalkane + Base -> Alkene + H2O + Halide
+            else if (left.some(f => /(Cl|Br|I)/.test(f)) && left.some(f => f.includes('OH') || f.includes('O')) && right.includes('H2O')) {
+                types.push("Elimination");
+            }
+            // Nucleophilic: Haloalkane + Nucleophile -> Alcohol/Ether/Nitrile/Amine/Thiol + X-
+            // Also covers Halogen Exchange (Finkelstein) and Alcohol -> Haloalkane
+            else if (left.some(f => /(Cl|Br|I)/.test(f)) && 
+                     right.some(f => f.includes('OH') || f.includes('CN') || f.includes('NH') || f.includes('SH') || (isOrganic(f) && f.includes('O')) || (isOrganic(f) && /(Cl|Br|I)/.test(f)))) {
+                types.push("Nucleophilic Substitution");
+            }
+            // Electrophilic: Benzene + ...
+            else if (left.some(f => f === 'C6H6')) {
+                types.push("Electrophilic Substitution");
+            }
+        }
+
+        // 10. Crystallisation (Formation of Hydrate)
+        if (right.some(f => f.includes('.'))) {
+            types.push("Crystallisation");
+        }
+
+        // 11. Ligand Substitution
+        const isComplex = (f) => f.startsWith('[') && f.includes(']');
+        if (left.some(isComplex) && right.some(isComplex)) {
+            types.push("Ligand Substitution");
+        }
+        
+        // Deduplicate and return
+        const uniqueTypes = [...new Set(types)];
+        return uniqueTypes.length > 0 ? uniqueTypes.join(", ") : "Reaction";
+    }
+
+    function renderResult(result, reactionType) {
+        // Helper: Check if organic (Local definition for context detection)
+        const isOrganic = (f) => {
+            const hasC = /C(?![a-z])/.test(f);
+            const hasH = /H(?![a-z])/.test(f);
+            if (hasC && hasH) return true;
+            if (hasC && !hasH && (f.includes('Cl') || f.includes('Br') || f.includes('I') || f.includes('F'))) {
+                if (!f.includes('O')) return true;
+            }
+            return false;
+        };
+
+        const leftFormulas = result.left.map(p => p.formula);
+        const rightFormulas = result.right.map(p => p.formula);
+        
+        // Detect context if not provided
+        let context = reactionType;
+        if (!context) {
+             const hasOrganicHalide = leftFormulas.some(f => isOrganic(f) && /(Cl|Br|I)/.test(f));
+             const hasCyanide = leftFormulas.some(f => f === 'CN-' || f === 'KCN' || f === 'NaCN');
+             const hasAmmonia = leftFormulas.includes('NH3');
+             const hasHydrosulfide = leftFormulas.some(f => f === 'SH-' || f === 'KSH' || f === 'NaSH');
+             const hasHydroxide = leftFormulas.some(f => f === 'OH-' || f === 'NaOH' || f === 'KOH');
+             const hasAlkoxide = leftFormulas.some(f => (f.endsWith('O-') && isOrganic(f)) || ((f.startsWith('Na') || f.startsWith('K')) && f.includes('O') && isOrganic(f)));
+             
+             if (hasOrganicHalide) {
+                 if (hasCyanide) context = 'substitution_eth';
+                 else if (hasAmmonia) context = 'substitution_eth';
+                 else if (hasHydrosulfide) context = 'substitution_eth';
+                 else if (hasAlkoxide) context = 'substitution_eth';
+                 else if (hasHydroxide) {
+                     // Elimination produces H2O. Substitution produces Alcohol.
+                     if (rightFormulas.includes('H2O')) {
+                         context = 'elimination_eth';
+                     } else {
+                         context = 'substitution_aq';
+                     }
+                 }
+             }
+        } else if (reactionType.includes('Nucleophilic Substitution')) {
+             // If identified as Nucleophilic Substitution, check for specific reagents to set context
+             const hasCyanide = leftFormulas.some(f => f.includes('CN'));
+             const hasAmmonia = leftFormulas.includes('NH3');
+             const hasHydrosulfide = leftFormulas.some(f => f.includes('SH'));
+             const hasAlkoxide = leftFormulas.some(f => (f.endsWith('O-') && isOrganic(f)) || ((f.startsWith('Na') || f.startsWith('K')) && f.includes('O') && isOrganic(f)));
+             
+             if (hasCyanide || hasAmmonia || hasHydrosulfide || hasAlkoxide) {
+                 context = 'substitution_eth';
+             }
+        }
+
+        // Helper to determine state
+        const determineState = (f) => {
+            // 0. Special Organic Context Overrides
+            if (context === 'elimination_eth' && (f === 'OH-' || f === 'NaOH' || f === 'KOH')) return 'eth';
+            if (context === 'substitution_eth') {
+                if (f === 'CN-' || f === 'KCN' || f === 'NaCN') return 'eth';
+                if (f === 'NH3') return 'eth';
+                if (f === 'SH-' || f === 'KSH' || f === 'NaSH') return 'eth';
+                // Alkoxides
+                if ((f.endsWith('O-') && isOrganic(f)) || ((f.startsWith('Na') || f.startsWith('K')) && f.includes('O') && isOrganic(f))) return 'eth';
+            }
+
+            // 1. Common Gases
+            const gases = ['H2', 'N2', 'O2', 'O3', 'F2', 'Cl2', 'He', 'Ne', 'Ar', 'Kr', 'Xe', 'Rn',
+                           'CO', 'CO2', 'SO2', 'SO3', 'NO', 'NO2', 'N2O', 'NH3', 'H2S',
+                           'CH4', 'C2H6', 'C3H8', 'C4H10', 'C2H4', 'C3H6', 'C2H2'];
+            if (gases.includes(f)) return 'g';
+
+            // 2. Common Liquids
+            const liquids = ['H2O', 'Br2', 'Hg', 'C2H5OH', 'CH3OH', 'C6H6', 'l'];
+            if (liquids.includes(f)) return 'l';
+
+            // 3. Common Solids (Elements)
+            // Single elements that are not gases/liquids are usually solids (Metals, C, S, P)
+            if (/^[A-Z][a-z]?$/.test(f) && !gases.includes(f) && !liquids.includes(f)) return 's'; 
+            if (['I2', 'C', 'S', 'P', 'P4', 'S8', 'Si', 'SiO2'].includes(f)) return 's';
+
+            // 4. Acids (Default to aq)
+            if (f === 'HCl' || f === 'HBr' || f === 'HI' || f === 'HF') return 'aq'; // Usually aq in reactions
+            if (f === 'H2SO4' || f === 'HNO3' || f === 'H3PO4' || f === 'HClO4' || f === 'CH3COOH' || f === 'H2CO3' || f === 'H2SO3' || f === 'HNO2') return 'aq';
+
+            // 4.5 Hydrates (Solids)
+            if (f.includes('.')) return 's';
+
+            // 5. Solubility Rules
+            const getElements = (formula) => {
+                const matches = formula.match(/[A-Z][a-z]?/g);
+                return matches ? [...new Set(matches)] : [];
+            };
+            const elements = getElements(f);
+
+            // --- Solubility Logic (Same as identifyReactionType) ---
+            // 1. Always Soluble
+            if (elements.some(e => ['Li', 'Na', 'K', 'Rb', 'Cs', 'Fr'].includes(e))) return 'aq';
+            if (f.includes('NH4')) return 'aq';
+            if (f.includes('NO3')) return 'aq';
+            if (f.includes('HCO3')) return 'aq';
+            if (f.includes('CH3COO') || f.includes('C2H3O2')) return 'aq';
+
+            // 2. Soluble with Exceptions
+            // Halides
+            if (/(Cl|Br|I)\d*$/.test(f)) {
+                if (elements.includes('Ag') || elements.includes('Pb')) return 's';
+                return 'aq';
+            }
+            // Sulphates
+            if (f.includes('SO4')) {
+                if (elements.includes('Ca') || elements.includes('Ba') || elements.includes('Pb')) return 's';
+                return 'aq';
+            }
+
+            // 3. Insoluble with Exceptions
+            // Carbonates
+            if (f.includes('CO3')) return 's'; // Group 1/NH4 handled above
+            // Hydroxides
+            // Exclude Organic Alcohols (contain C and H) from this check
+            if ((f.endsWith('OH') || f.includes('(OH)')) && !(f.includes('C') && f.includes('H'))) {
+                if (elements.includes('Ca') || elements.includes('Ba')) return 'aq'; // Slightly soluble -> aq
+                return 's';
+            }
+            // Oxides
+            if (/^[A-Z][a-z]?\d*O\d*$/.test(f)) {
+                if (elements.includes('Ca') || elements.includes('Ba')) return 's'; // Reacts with water, but as oxide is solid
+                return 's';
+            }
+
+            // Default for ionic-looking things?
+            // If it has metal + non-metal, assume solid if not matched above?
+            // Or assume aqueous if not matched?
+            // Let's default to 'aq' for unknown salts to be safe, or 's'?
+            // Most common salts are soluble.
+            return 'aq';
+        };
+
+        const formatSide = (parts) => {
+            return parts.map(p => {
+                const coeffHtml = p.coeff > 1 ? `<span class="chem-coeff">${p.coeff}</span>` : '';
+                
+                let f = p.formula;
+                let base = f;
+                let charge = '';
+                
+                // Check for charge at the end (e.g., 2+, 3-, +, -)
+                // We look for a sequence of digits (optional) followed by + or - at the end of the string
+                // Also handle unicode minus sign (U+2212) which is common in copy-pasted text
+                const chargeMatch = f.match(/^(.*?)(\d*[+\-−]+)$/);
+                if (chargeMatch) {
+                    base = chargeMatch[1];
+                    charge = chargeMatch[2].replace(/−/g, '-'); // Normalize unicode minus
+                }
+                
+                // Subscript numbers in base
+                let baseHtml = '';
+                if (base.includes('.')) {
+                    const split = base.split('.');
+                    const salt = split[0];
+                    const hydrate = split[1];
+                    
+                    const saltHtml = salt.replace(/(\d+)/g, '<sub>$1</sub>');
+                    
+                    // Handle hydrate part: "5H2O" -> "5" is normal, "2" is sub
+                    const match = hydrate.match(/^(\d+)(.*)/);
+                    let hydrateHtml = '';
+                    if (match) {
+                        const coef = match[1];
+                        const rest = match[2];
+                        hydrateHtml = coef + rest.replace(/(\d+)/g, '<sub>$1</sub>');
+                    } else {
+                        hydrateHtml = hydrate.replace(/(\d+)/g, '<sub>$1</sub>');
+                    }
+                    
+                    baseHtml = `${saltHtml}<sub>.</sub>${hydrateHtml}`;
+                } else {
+                    baseHtml = base.replace(/(\d+)/g, '<sub>$1</sub>');
+                }
+                
+                // Superscript charge
+                const chargeHtml = charge ? `<sup>${charge}</sup>` : '';
+                
+                const formulaHtml = baseHtml + chargeHtml;
+                
+                const state = determineState(p.formula);
+                return `<span class="chem-formula">${coeffHtml}${formulaHtml}<sub style="font-size:0.8em; color:#dcd0c0;">(${state})</sub></span>`;
+            }).join('<span style="margin:0 10px; color:#aaaaaa; font-weight:bold;">+</span>');
+        };
+
+        const leftHtml = formatSide(result.left);
+        const rightHtml = formatSide(result.right);
+        
+        let html = `<div class="balanced-eq" style="display:flex; align-items:center; justify-content:center; flex-wrap:wrap;">${leftHtml} <span style="margin:0 15px; color:#aaaaaa; font-size:1.5rem;">➝</span> ${rightHtml}</div>`;
+
+        // Add warning for Ammonia Substitution Salt
+        if (reactionType && reactionType.includes('Nucleophilic Substitution') && rightFormulas.length === 1 && leftFormulas.includes('NH3')) {
+             html += `<div style="margin-top:5px; font-size:0.85rem; color:#e6a23c;">Note: This equation shows the formation of the ammonium salt. The full substitution reaction typically requires 2NH<sub>3</sub> to form the amine and ammonium halide.</div>`;
+        }
+
+        return html;
+    }
+
+    function balanceEquation(equationStr) {
+        const sides = equationStr.split('=').map(s => s.trim());
+        if(sides.length !== 2) throw new Error("Equation must contain exactly one '='");
+        
+        // Remove leading coefficients from input AND remove all internal spaces and invisible chars
+        // Also normalize unicode minus to hyphen
+        const cleanFormula = (s) => s.replace(/^\d+/, '')
+                                     .replace(/[\s\u200b\u200c\u200d\u200e\u200f]+/g, '')
+                                     .replace(/−/g, '-');
+
+        const parseSide = (sideStr) => {
+            return sideStr.split('+').map(s => s.trim()).filter(s => s).map(cleanFormula);
+        };
+        
+        const leftMols = parseSide(sides[0]);
+        const rightMols = parseSide(sides[1]);
+        
+        if(leftMols.length === 0 || rightMols.length === 0) throw new Error("Both sides must have compounds");
+
+        const allMols = [...leftMols, ...rightMols];
+        const elements = new Set();
+        
+        const parseFormula = (formula) => {
+            // Remove charge part for atom counting (e.g. OH- -> OH, Fe3+ -> Fe)
+            // Match end of string charge like 2+, 3-, +, -
+            const chargeRegex = /(\d*[+\-−]+)$/;
+            const neutralFormula = formula.replace(chargeRegex, '');
+
+            // Inner function for parsing standard molecules
+            const parseSimple = (fStr) => {
+                const counts = {};
+                let i = 0;
+                
+                function parseGroup() {
+                    const groupCounts = {};
+                    while (i < fStr.length) {
+                        const char = fStr[i];
+                        if (char === '(') {
+                            i++;
+                            const inner = parseGroup();
+                            let count = 1;
+                            let numStr = '';
+                            while (i < fStr.length && /\d/.test(fStr[i])) {
+                                numStr += fStr[i];
+                                i++;
+                            }
+                            if (numStr) count = parseInt(numStr);
+                            
+                            for (let el in inner) {
+                                groupCounts[el] = (groupCounts[el] || 0) + inner[el] * count;
+                            }
+                        } else if (char === ')') {
+                            i++;
+                            return groupCounts;
+                        } else if (/[A-Z]/.test(char)) {
+                            let element = char;
+                            i++;
+                            while (i < fStr.length && /[a-z]/.test(fStr[i])) {
+                                element += fStr[i];
+                                i++;
+                            }
+                            let count = 1;
+                            let numStr = '';
+                            while (i < fStr.length && /\d/.test(fStr[i])) {
+                                numStr += fStr[i];
+                                i++;
+                            }
+                            if (numStr) count = parseInt(numStr);
+                            groupCounts[element] = (groupCounts[element] || 0) + count;
+                        } else {
+                            // Skip unknown characters (like charge symbols +, -)
+                            i++; 
+                        }
+                    }
+                    return groupCounts;
+                }
+                return parseGroup();
+            };
+
+            // Handle hydrates
+            if (neutralFormula.includes('.')) {
+                const parts = neutralFormula.split('.');
+                const totalCounts = {};
+                parts.forEach(part => {
+                    let subF = part;
+                    let mult = 1;
+                    // Check for leading coefficient in hydrate part (e.g. 5H2O)
+                    const m = subF.match(/^(\d+)(.*)/);
+                    if (m) {
+                        mult = parseInt(m[1]);
+                        subF = m[2];
+                    }
+                    const c = parseSimple(subF);
+                    for (let k in c) {
+                        totalCounts[k] = (totalCounts[k] || 0) + c[k] * mult;
+                    }
+                });
+                return totalCounts;
+            } else {
+                return parseSimple(neutralFormula);
+            }
+        };
+
+        const molComps = allMols.map(m => {
+            const c = parseFormula(m);
+            for(let e in c) elements.add(e);
+            return c;
+        });
+
+        const elemList = Array.from(elements);
+        const colCount = allMols.length;
+        const rowCount = elemList.length;
+
+        const matrix = [];
+        for(let r=0; r<rowCount; r++) {
+            const row = [];
+            const el = elemList[r];
+            for(let c=0; c<colCount; c++) {
+                let val = molComps[c][el] || 0;
+                if(c >= leftMols.length) val = -val; 
+                row.push(val);
+            }
+            matrix.push(row);
+        }
+
+        const coeffs = solveHomogeneous(matrix);
+        if(!coeffs) throw new Error("no solution found");
+
+        return {
+            left: leftMols.map((m, i) => ({ formula: m, coeff: coeffs[i] })),
+            right: rightMols.map((m, i) => ({ formula: m, coeff: coeffs[leftMols.length + i] }))
+        };
+    }
+
+    function solveHomogeneous(matrix) {
+        const rows = matrix.length;
+        const cols = matrix[0].length;
+        const m = matrix.map(r => [...r]);
+        
+        let pivotRow = 0;
+        const pivotCols = [];
+
+        for (let j = 0; j < cols && pivotRow < rows; j++) {
+            let sel = pivotRow;
+            while (sel < rows && Math.abs(m[sel][j]) < 1e-9) sel++;
+            
+            if (sel === rows) continue;
+            
+            [m[pivotRow], m[sel]] = [m[sel], m[pivotRow]];
+            pivotCols.push(j);
+            
+            const pivotVal = m[pivotRow][j];
+            for(let k=j; k<cols; k++) m[pivotRow][k] /= pivotVal;
+            
+            for(let i=0; i<rows; i++) {
+                if(i !== pivotRow) {
+                    const factor = m[i][j];
+                    for(let k=j; k<cols; k++) m[i][k] -= factor * m[pivotRow][k];
+                }
+            }
+            pivotRow++;
+        }
+
+        const isPivot = new Array(cols).fill(false);
+        pivotCols.forEach(c => isPivot[c] = true);
+        const freeCols = [];
+        for(let c=0; c<cols; c++) if(!isPivot[c]) freeCols.push(c);
+        
+        if(freeCols.length === 0) return null; 
+        
+        const solution = new Array(cols).fill(0);
+        const freeVarIndex = freeCols[freeCols.length - 1];
+        solution[freeVarIndex] = 1;
+        
+        for(let i=pivotRow-1; i>=0; i--) {
+            let pCol = -1;
+            for(let c=0; c<cols; c++) {
+                if(Math.abs(m[i][c]) > 1e-9) { 
+                    pCol = c;
+                    break;
+                }
+            }
+            if(pCol === -1) continue;
+            
+            let sum = 0;
+            for(let k=pCol+1; k<cols; k++) {
+                sum += m[i][k] * solution[k];
+            }
+            solution[pCol] = -sum;
+        }
+        
+        let maxDenom = 1;
+        const epsilon = 1e-6;
+        
+        const toFraction = (val) => {
+            let bestD = 1;
+            let minErr = Math.abs(val - Math.round(val));
+            for(let d=1; d<=1000; d++) {
+                let n = Math.round(val * d);
+                let err = Math.abs(val - n/d);
+                if(err < minErr) {
+                    minErr = err;
+                    bestD = d;
+                }
+                if(err < 1e-9) break;
+            }
+            return bestD;
+        };
+        
+        let lcm = 1;
+        const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+        const getLcm = (a, b) => (a * b) / gcd(a, b);
+        
+        solution.forEach(v => {
+            if(Math.abs(v) > epsilon) {
+                const d = toFraction(v);
+                lcm = getLcm(lcm, d);
+            }
+        });
+        
+        const intSolution = solution.map(v => Math.round(v * lcm));
+        const overallGcd = intSolution.reduce((acc, val) => gcd(acc, val), intSolution[0]);
+        const finalSolution = intSolution.map(v => v / overallGcd);
+        
+        if(finalSolution.some(v => v <= 0)) return null;
+        
+        return finalSolution;
+    }
 })();
 </script>
 </body>
