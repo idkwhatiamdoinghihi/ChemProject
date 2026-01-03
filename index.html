@@ -761,10 +761,11 @@ body:has(.viewport-panel.active[data-tool="Equation Balancer"]) .controls-area {
     overflow: hidden;
 }
 
-.viewport-panel[data-tool="Elements"] .periodic-table {
+    .viewport-panel[data-tool="Elements"] .periodic-table {
     display: grid;
     grid-template-columns: 30px repeat(18, 65px);
-    grid-template-rows: 30px 85px 85px 85px 85px 85px 85px 85px 85px;
+    /* Added two extra rows at the end for lanthanides & actinides */
+    grid-template-rows: 30px 85px 85px 85px 85px 85px 85px 85px 85px 85px 85px;
     gap: 4px;
     /* Remove max-width/overflow from here, let container handle it via transform */
     padding-bottom: 0; /* Remove padding-bottom */
@@ -786,6 +787,17 @@ body:has(.viewport-panel.active[data-tool="Equation Balancer"]) .controls-area {
     user-select: none;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     color: #000;
+}
+
+/* Shift the lanthanide/actinide f-block rows down by 20px without altering box design */
+.viewport-panel[data-tool="Elements"] .periodic-table .element.f-block {
+    position: relative;
+    top: 20px;
+}
+
+/* Shift f-block rows right by 50px (visual only) */
+.viewport-panel[data-tool="Elements"] .periodic-table .element.f-block {
+    left: 50px;
 }
 
 .viewport-panel[data-tool="Elements"] .element:hover {
@@ -6071,10 +6083,25 @@ if (window._nativeRenderScene) window.renderScene = window._nativeRenderScene;
             { num: 53, sym: "I", name: "Iodine", mass: "127", col: 17, row: 6, cat: "Halogen" },
             { num: 54, sym: "Xe", name: "Xenon", mass: "131", col: 18, row: 6, cat: "Noble Gas" },
             // Period 6
-            { num: 55, sym: "Cs", name: "Caesium", mass: "133", col: 1, row: 7, cat: "Alkali Metal" },
-            { num: 56, sym: "Ba", name: "Barium", mass: "137", col: 2, row: 7, cat: "Alkaline Earth" },
-            { num: 57, sym: "La*", name: "Lanthanum", mass: "139", col: 3, row: 7, cat: "Lanthanide" },
-            { num: 72, sym: "Hf", name: "Hafnium", mass: "178", col: 4, row: 7, cat: "Transition Metal" },
+                { num: 55, sym: "Cs", name: "Caesium", mass: "133", col: 1, row: 7, cat: "Alkali Metal" },
+                    { num: 56, sym: "Ba", name: "Barium", mass: "137", col: 2, row: 7, cat: "Alkaline Earth" },
+                // Lanthanide series (moved to f-block rows) — category stored here
+                { num: 57, sym: "La", name: "Lanthanum", mass: "139", col: 3, row: 9, cat: "Lanthanide" },
+                { num: 58, sym: "Ce", name: "Cerium", mass: "140", col: 4, row: 9, cat: "Lanthanide" },
+                { num: 59, sym: "Pr", name: "Praseodymium", mass: "141", col: 5, row: 9, cat: "Lanthanide" },
+                { num: 60, sym: "Nd", name: "Neodymium", mass: "144", col: 6, row: 9, cat: "Lanthanide" },
+                { num: 61, sym: "Pm", name: "Promethium", mass: "145", col: 7, row: 9, cat: "Lanthanide" },
+                { num: 62, sym: "Sm", name: "Samarium", mass: "150", col: 8, row: 9, cat: "Lanthanide" },
+                { num: 63, sym: "Eu", name: "Europium", mass: "152", col: 9, row: 9, cat: "Lanthanide" },
+                { num: 64, sym: "Gd", name: "Gadolinium", mass: "157", col: 10, row: 9, cat: "Lanthanide" },
+                { num: 65, sym: "Tb", name: "Terbium", mass: "159", col: 11, row: 9, cat: "Lanthanide" },
+                { num: 66, sym: "Dy", name: "Dysprosium", mass: "162", col: 12, row: 9, cat: "Lanthanide" },
+                { num: 67, sym: "Ho", name: "Holmium", mass: "165", col: 13, row: 9, cat: "Lanthanide" },
+                { num: 68, sym: "Er", name: "Erbium", mass: "167", col: 14, row: 9, cat: "Lanthanide" },
+                { num: 69, sym: "Tm", name: "Thulium", mass: "169", col: 15, row: 9, cat: "Lanthanide" },
+                { num: 70, sym: "Yb", name: "Ytterbium", mass: "173", col: 16, row: 9, cat: "Lanthanide" },
+                { num: 71, sym: "Lu", name: "Lutetium", mass: "175", col: 17, row: 9, cat: "Lanthanide" },
+                { num: 72, sym: "Hf", name: "Hafnium", mass: "178", col: 4, row: 7, cat: "Transition Metal" },
             { num: 73, sym: "Ta", name: "Tantalum", mass: "181", col: 5, row: 7, cat: "Transition Metal" },
             { num: 74, sym: "W", name: "Tungsten", mass: "184", col: 6, row: 7, cat: "Transition Metal" },
             { num: 75, sym: "Re", name: "Rhenium", mass: "186", col: 7, row: 7, cat: "Transition Metal" },
@@ -6092,7 +6119,22 @@ if (window._nativeRenderScene) window.renderScene = window._nativeRenderScene;
             // Period 7
             { num: 87, sym: "Fr", name: "Francium", mass: "[223]", col: 1, row: 8, cat: "Alkali Metal" },
             { num: 88, sym: "Ra", name: "Radium", mass: "[226]", col: 2, row: 8, cat: "Alkaline Earth" },
-            { num: 89, sym: "Ac*", name: "Actinium", mass: "[227]", col: 3, row: 8, cat: "Actinide" },
+            // Actinide series (category stored in `elements`)
+            { num: 89, sym: "Ac", name: "Actinium", mass: "[227]", col: 3, row: 10, cat: "Actinide" },
+            { num: 90, sym: "Th", name: "Thorium", mass: "232", col: 4, row: 10, cat: "Actinide" },
+            { num: 91, sym: "Pa", name: "Protactinium", mass: "231", col: 5, row: 10, cat: "Actinide" },
+            { num: 92, sym: "U", name: "Uranium", mass: "238", col: 6, row: 10, cat: "Actinide" },
+            { num: 93, sym: "Np", name: "Neptunium", mass: "237", col: 7, row: 10, cat: "Actinide" },
+            { num: 94, sym: "Pu", name: "Plutonium", mass: "244", col: 8, row: 10, cat: "Actinide" },
+            { num: 95, sym: "Am", name: "Americium", mass: "243", col: 9, row: 10, cat: "Actinide" },
+            { num: 96, sym: "Cm", name: "Curium", mass: "247", col: 10, row: 10, cat: "Actinide" },
+            { num: 97, sym: "Bk", name: "Berkelium", mass: "247", col: 11, row: 10, cat: "Actinide" },
+            { num: 98, sym: "Cf", name: "Californium", mass: "251", col: 12, row: 10, cat: "Actinide" },
+            { num: 99, sym: "Es", name: "Einsteinium", mass: "252", col: 13, row: 10, cat: "Actinide" },
+            { num: 100, sym: "Fm", name: "Fermium", mass: "257", col: 14, row: 10, cat: "Actinide" },
+            { num: 101, sym: "Md", name: "Mendelevium", mass: "258", col: 15, row: 10, cat: "Actinide" },
+            { num: 102, sym: "No", name: "Nobelium", mass: "259", col: 16, row: 10, cat: "Actinide" },
+            { num: 103, sym: "Lr", name: "Lawrencium", mass: "262", col: 17, row: 10, cat: "Actinide" },
             { num: 104, sym: "Rf", name: "Ruther.", mass: "[261]", col: 4, row: 8, cat: "Transition Metal" },
             { num: 105, sym: "Db", name: "Dubnium", mass: "[262]", col: 5, row: 8, cat: "Transition Metal" },
             { num: 106, sym: "Sg", name: "Seaborg.", mass: "[266]", col: 6, row: 8, cat: "Transition Metal" },
@@ -6153,6 +6195,9 @@ if (window._nativeRenderScene) window.renderScene = window._nativeRenderScene;
                 block = 'Unknown';
             }
 
+            // Add a CSS marker class for f-block elements so we can shift them via CSS
+            if (block === 'f-block') div.classList.add('f-block');
+
             // Determine Color based on Category
             let bgColor = '#f9f9f9';
             const catColors = {
@@ -6199,6 +6244,9 @@ if (window._nativeRenderScene) window.renderScene = window._nativeRenderScene;
 
             container.appendChild(div);
         });
+
+        // f-block elements (lanthanides & actinides) are included in `elements` array
+        // and will be rendered by the main loop above. No extra appending needed here.
 
         // Modal Logic
         const modal = document.getElementById('modal');
@@ -6256,7 +6304,12 @@ if (window._nativeRenderScene) window.renderScene = window._nativeRenderScene;
             
             const mp = eData ? eData.mp : '-';
             const bp = eData ? eData.bp : '-';
-            const period = el.row - 1; 
+            // f-block elements are visually placed on extra rows; presentationally
+            // lanthanides belong to period 6 and actinides to period 7.
+            let period;
+            if (el.cat === 'Lanthanide') period = 6;
+            else if (el.cat === 'Actinide') period = 7;
+            else period = el.row - 1;
             const group = eData ? (eData.iupac || eData.g) : (el.col > 1 ? el.col - 1 : '-'); // Adjust for period column if using grid col
             const block = el.block;
             
